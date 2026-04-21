@@ -1,0 +1,16 @@
+<div id="task-{{ task.id }}" class="task-item">
+    <span>{{ task.title }}</span>
+    
+    <div x-data="{ confirming: false }">
+        <button type="button" @click="confirming = true" x-show="!confirming">Delete</button>
+        
+        <div x-show="confirming">
+            Are you sure? 
+            <button @click="confirming = false">No</button>
+            <button hx-delete="{% url 'delete_task' task.id %}" 
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-target="#task-{{ task.id }}" 
+                    hx-swap="delete">Yes, Delete</button>
+        </div>
+    </div>
+</div>
