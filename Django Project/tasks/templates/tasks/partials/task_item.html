@@ -1,16 +1,84 @@
-<div id="task-{{ task.id }}" class="task-item">
-    <span>{{ task.title }}</span>
+<div id="task-{{ task.id }}" class="task-item" x-data="taskItem({{ task.id }}, '{{ task.title|escapejs }}', {{ task.completed|lower }})">
+    <div class="task-content" x-show="!editing">
+        <input type="checkbox" 
+               x-model="completed" 
+               @change="toggleCompleted()"
+               class="task-checkbox">
+        <span :class="{ 'completed': completed }" x-text="title" @dblclick="startEdit()"></span>
+    </div>
+    
+    <input x-show="editing" 
+           x-model="editTitle" 
+           @keydown.enter="saveEdit()" 
+           @keydown.escape="cancelEdit()"
+           x-ref="editInput"
+           class="task-edit-input">
     
     <div x-data="{ confirming: false }">
-        <button type="button" @click="confirming = true" x-show="!confirming">Delete</button>
+        <button type="button" @click="confirming = true" x-show="!confirming && !editing">Delete</button>
         
         <div x-show="confirming">
             Are you sure? 
             <button @click="confirming = false">No</button>
             <button hx-delete="{% url 'delete_task' task.id %}" 
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
                     hx-target="#task-{{ task.id }}" 
                     hx-swap="delete">Yes, Delete</button>
         </div>
     </div>
 </div>
+
+<script>
+function taskItem(id, initialTitle, initialCompleted) {
+    return {
+        id: id,
+        title: initialTitle,
+        completed: initialCompleted,
+        editing: false,
+        editTitle: initialTitle,
+        
+        startEdit() {
+            this.editing = true;
+            this.editTitle = this.title;
+            this.$nextTick(() => {
+                this.$refs.editInput.focus();
+                this.$refs.editInput.select();
+            });
+        },
+        
+        saveEdit() {
+            if (this.editTitle.trim()) {
+                this.title = this.editTitle.trim();
+                this.editing = false;
+                this.updateTask();
+            }
+        },
+        
+        cancelEdit() {
+            this.editTitle = this.title;
+            this.editing = false;
+        },
+        
+        toggleCompleted() {
+            this.updateTask();
+        },
+        
+        updateTask() {
+            fetch(`/update/${this.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    title: this.title,
+                    completed: this.completed
+                })
+            }).then(() => {
+                // Dispatch event to update stats
+                window.dispatchEvent(new CustomEvent('task-updated'));
+            });
+        }
+    }
+}
+</script>
