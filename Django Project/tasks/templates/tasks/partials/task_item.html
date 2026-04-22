@@ -14,7 +14,7 @@
            x-ref="editInput"
            class="task-edit-input">
     
-    <div x-data="{ confirming: false }">
+    <div x-data="{ confirming: false }" class="delete-confirm">
         <button type="button" @click="confirming = true" x-show="!confirming && !editing">Delete</button>
         
         <div x-show="confirming">
@@ -27,58 +27,3 @@
         </div>
     </div>
 </div>
-
-<script>
-function taskItem(id, initialTitle, initialCompleted) {
-    return {
-        id: id,
-        title: initialTitle,
-        completed: initialCompleted,
-        editing: false,
-        editTitle: initialTitle,
-        
-        startEdit() {
-            this.editing = true;
-            this.editTitle = this.title;
-            this.$nextTick(() => {
-                this.$refs.editInput.focus();
-                this.$refs.editInput.select();
-            });
-        },
-        
-        saveEdit() {
-            if (this.editTitle.trim()) {
-                this.title = this.editTitle.trim();
-                this.editing = false;
-                this.updateTask();
-            }
-        },
-        
-        cancelEdit() {
-            this.editTitle = this.title;
-            this.editing = false;
-        },
-        
-        toggleCompleted() {
-            this.updateTask();
-        },
-        
-        updateTask() {
-            fetch(`/update/${this.id}/`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    title: this.title,
-                    completed: this.completed
-                })
-            }).then(() => {
-                // Dispatch event to update stats
-                window.dispatchEvent(new CustomEvent('task-updated'));
-            });
-        }
-    }
-}
-</script>

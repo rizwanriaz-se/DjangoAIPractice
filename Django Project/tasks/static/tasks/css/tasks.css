@@ -1,0 +1,91 @@
+.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    margin: 4px 0;
+    border-radius: 4px;
+}
+
+.task-checkbox {
+    margin-right: 8px;
+}
+
+.task-edit-input {
+    flex: 1;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.task-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.task-stats {
+    margin-bottom: 20px;
+}
+
+.task-form {
+    margin-bottom: 20px;
+}
+
+.task-form input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    flex: 1;
+}
+
+.task-form button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.task-form button:hover {
+    background-color: #0056b3;
+}
+
+.task-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.task-container {
+    margin-top: 20px;
+}
+
+.delete-confirm {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.delete-confirm button {
+    margin-left: 5px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-confirm button:first-child {
+    background-color: #f8f9fa;
+}
+
+.delete-confirm button:last-child {
+    background-color: #dc3545;
+    color: white;
+}

@@ -1,44 +1,11 @@
 <script src="https://unpkg.com/htmx.org"></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<script>
-    document.body.addEventListener('htmx:configRequest', (event) => {
-        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-    });
-    
-    document.body.addEventListener('htmx:afterSwap', () => {
-        window.dispatchEvent(new CustomEvent('task-updated'));
-    });
-</script>
-
-<style>
-.completed {
-    text-decoration: line-through;
-    color: #888;
-}
-.task-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border: 1px solid #ddd;
-    margin: 4px 0;
-    border-radius: 4px;
-}
-.task-checkbox {
-    margin-right: 8px;
-}
-.task-edit-input {
-    flex: 1;
-    padding: 4px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-.task-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-</style>
+{% load static %}
+<script>window.csrfToken = "{{ csrf_token }}";</script>
+<script src="{% static 'tasks/js/htmx-config.js' %}"></script>
+<script src="{% static 'tasks/js/task-manager.js' %}"></script>
+<script src="{% static 'tasks/js/task-item.js' %}"></script>
+<link rel="stylesheet" href="{% static 'tasks/css/tasks.css' %}">
 
 <h1>My Tasks</h1>
 
@@ -56,7 +23,8 @@
           hx-target="#task-container" 
           hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
           hx-swap="beforeend" 
-          hx-on::after-request="newTask = ''; window.dispatchEvent(new CustomEvent('task-added'))">
+          hx-on::after-request="newTask = ''; window.dispatchEvent(new CustomEvent('task-added'))"
+          class="task-form">
         {% csrf_token %}
         <input type="text" x-model="newTask" name="title" placeholder="New task..." required>
         <button type="submit" :disabled="!newTask.trim()">Add Task</button>
@@ -64,23 +32,9 @@
 
     <hr>
 
-    <div id="task-container">
+    <div id="task-container" class="task-container">
         {% for task in tasks %}
             {% include 'tasks/partials/task_item.html' %}
         {% endfor %}
     </div>
 </div>
-
-<script>
-function taskManager(initialTotal = 0, initialCompleted = 0) {
-    return {
-        totalTasks: initialTotal,
-        completedTasks: initialCompleted,
-        
-        updateStats() {
-            this.totalTasks = document.querySelectorAll('.task-item').length;
-            this.completedTasks = document.querySelectorAll('.task-checkbox:checked').length;
-        }
-    }
-}
-</script>
